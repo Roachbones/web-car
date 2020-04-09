@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>car controls</title>
+<style>
+body {
+	font-family: sans;
+	background-color: #ddeeff;
+}
+main {
+	max-width:75vh;
+	margin: auto;
+}
+#control-grid {
+	display: grid;
+	grid-template-columns: 33% 33% 33%;
+	border: dashed;
+}
+#control-grid > img {
+	padding: 5%;
+}
+#control-grid > input {
+	padding: 5%;
+}
+#log {
+	height: 8em;
+	overflow: scroll;
+	background-color: #fefefe;
+}
+</style>
+<script>
+
+function update_duration_output() {
+	output = document.getElementById("duration_output");
+	range = document.getElementById("duration_range");
+	output.innerHTML = parseInt(range.value);
+}
+function send(direction) {
+	log_append("pressed button with direction " + direction)
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4) {
+			if (this.status != 0) {
+				log_append(this.responseText);
+			} else {
+				log_append("No response. ☹");
+			}
+		}
+	};
+	xhttp.open("POST", "control", true);
+	duration = document.getElementById("duration_range").value;
+	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhttp.send("direction=" + direction + "&duration=" + duration);
+}
+function log_append(string) {
+	log_element = document.getElementById("log");
+	log_element.innerHTML += string + "<br>";
+	log_element.scrollTop = log_element.scrollHeight;
+}
+</script>
+</head>
+<body onload="update_duration_output()">
+<main>
+<div id="control-grid">
+	<input type="image" src="static/ccw_up.svg" onclick="send('fl')" style="transform:rotate(-90deg)"/>
+	<input type="image" src="static/up.svg" onclick="send('f')"/>
+	<input type="image" src="static/ccw_up.svg" onclick="send('fr')" style="transform:rotate(90deg) scaleX(-1)"/>
+	<input type="image" src="static/ccw_up.svg" onclick="send('bl')" style="transform:scaleX(-1) rotate(90deg)"/>
+	<input type="image" src="static/up.svg" onclick="send('b')" style="transform:rotate(180deg)"/>
+	<input type="image" src="static/ccw_up.svg" onclick="send('br')" style="transform:rotate(90deg)"/>
+</div>
+<label for="duration_range">duration</label>
+<input id="duration_range", type="range" min="10" max="1000" oninput="update_duration_output()"/>
+<output for="duration_range" id="duration_output"></output> milliseconds
+<br> <!-- haha line break element go br -->
+<br>
+<label for="log">Log</label>
+<div id="log">
+
+</div>
+</main>
+</body>
+</html>
